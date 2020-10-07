@@ -1,0 +1,33 @@
+source 'https://github.com/tapkey/TapkeyCocoaPods'
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '10.0'
+inhibit_all_warnings!
+
+target 'App' do
+  use_frameworks!
+
+  pod 'SwiftLint'
+  pod 'TapkeyMobileLib', '2.21.2.2'
+  pod 'TapkeyMobileLib/Fcm', '2.21.2.2'
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Auth'
+  pod 'Sentry'
+
+  target 'AppTests' do
+    inherit! :search_paths
+  end
+
+  target 'AppUITests' do
+  end
+
+end
+
+# Xcode 12 and later supports only deplyoment target 9 or later
+post_install do |pi|
+    pi.pods_project.targets.each do |t|
+        t.build_configurations.each do |config|
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+        end
+    end
+end

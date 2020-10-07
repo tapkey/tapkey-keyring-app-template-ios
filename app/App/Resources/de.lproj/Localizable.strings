@@ -1,0 +1,87 @@
+/********************
+ *                  *
+ *      German     *
+ *                  *
+ *******************/
+
+/******************
+ Common
+ ******************/
+"ok" = "Ok";
+
+/******************
+ Login
+ ******************/
+"sign_in_using_your_phone_number"    = "Logge dich mit deiner Telefonnummer ein:";
+"i_accept_the_terms_and_conditions"  = "Ich akzeptiere die <u>AGBs<u>.";
+
+"phone_number_error_missing_code" = "Bitte gib deine Telefonnummer inklusive Landesvorwahl (z.B. +49) an.";
+
+"enter_the_code_that_was_sent_to_you" = "Gib den Code ein:";
+"resend_code"      = "Code erneut senden";
+"resend_code_in"   = "Code erneut senden in";
+"continue_sign_in" = "Weiter";
+"code_error" = "Ein Fehler ist aufgetreten, bitte versuche es erneut.";
+"wrong_code" = "Falscher Code";
+
+/******************
+ Tab Bar
+ ******************/
+"menu_keys"              = "Schlüssel";
+"settings"               = "Einstellungen";
+
+/******************
+ Keys
+ ******************/
+"nearby"                                              = "In der Nähe";
+"other"                                               = "Andere";
+"restricted"                                          = "Eingeschränkt";
+"unrestricted"                                        = "Uneingeschränkt";
+"no_nearby"                                           = "Keine Schlösser in der Nähe.";
+"open"                                                = "öffnen";
+"ble_needs_to_be_authorized_for_this_app_to_work"     = "Die BLE-Berechtigung muss erteilt werden, damit diese App funktioniert.";
+"ble_needs_to_be_enabled_for_this_app_to_work"        = "BLE muss eingeschaltet sein, damit diese App funktioniert.";
+"go_to_settings"                                      = "Gehe zu Einstellungen ->";
+"updating_keys"                                       = "Schlüssel aktualisieren ...";
+
+/******************
+ Key Details
+ ******************/
+"key_details"           = "Schlüsseldetails";
+"key_always_valid"      = "Der Schlüssel ist uneingeschränkt gültig.";
+"key_restricted"        = "Der Schlüssel ist eingeschränkt gültig.";
+"key_offline_access"    = "Der Schlüssel für %@ kann  bis %@ offline genutzt werden. Er wird am %@ erneuert.";
+
+/******************
+ Settings
+ ******************/
+"menu_about"              = "Über";
+"menu_sign_out"           = "Ausloggen";
+
+"sign_out_warning_title"    = "Ausloggen?";
+"sign_out_warning_message"  = "Nach dem Ausloggen können keine Schlüssel mehr abgerufen werden.";
+"sign_out_warning_positive" = "Ausloggen";
+"sign_out_warning_cancel"   = "Abbrechen";
+
+/******************
+ About
+ ******************/
+"version"              = "Version %@";
+"address"              = "Sample Company";
+"terms_and_conditions" = "AGB";
+"tos_url"              = "https://tapkey.com/pages/terms-conditions";
+
+/******************
+ Trigger Lock
+ ******************/
+"success" = "Erfolgreich";
+"wrongLockMode" = "Diese Aktion is zurzeit nicht möglich, weil sich das Schloss im Owner-Modus befindet.";
+"lockVersionTooOld" = "Bitte aktualisiere dein Schloss.";
+"lockVersionTooYoung" = "Bitte aktualisiere deine App.";
+"lockNotFullyAssembled" = "Das Schloss scheint nicht vollständig zusammengebaut zu sein.";
+"serverCommunicationError" = "Server-Fehler. Bitte prüfe die Internetverbindung.";
+"lockDateTimeInvalid" = "Die Uhrzeit auf dem Schloss ist falsch.";
+"unauthorizedNotYetValid" = "Du hast eine Berechtigung, die erst in der Zukunft gültig wird.";
+"unauthorized" = "Du bist nicht autorisiert.";
+"lockCommunicationError" = "Die Verbindung wurde unterbrochen. Bitte versuche es erneut.";
+"genericError" = "Etwas ist schief gelaufen. Bitte versuche es erneut.";

@@ -1,0 +1,6 @@
+APP_NAME=Tapkey Keyring App Template for iOS
+BUNDLE_IDENTIFIER=io.tapkey.wl.app
+GOOGLE_REVERSED_CLIENT_ID=
+
+#include "../../BuildSettings.xcconfig"
+INCLUDED_SOURCE_FILE_NAMES = env/prod/*

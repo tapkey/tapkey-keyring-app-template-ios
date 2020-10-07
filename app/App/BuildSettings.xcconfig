@@ -1,0 +1,13 @@
+DEVELOPMENT_TEAM=
+
+// The version of this app. Change when releasing a new app
+VERSION_MAJOR=0
+VERSION_MINOR=1
+VERSION_REVISION=0
+
+// The version of the Tapkey Keyring App Template for iOS this app is based on.
+// Don't modify this value. This value will change when merging a newer Tapkey Keyring App Template for iOS version
+TAPKEY_KEYRING_APP_TEMPLATE_VERSION="1.2.0"
+
+EXCLUDED_SOURCE_FILE_NAMES = env/**/*
+#include "Version.xcconfig"

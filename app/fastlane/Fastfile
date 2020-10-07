@@ -1,0 +1,119 @@
+default_platform(:ios)
+skip_docs
+ensure_bundle_exec
+
+@environments = {
+  'production' => {
+    'scheme' => 'App Production',
+    'Configuration' => 'App/env/prod/EnvBuildSettings.xcconfig'
+  },
+  'sandbox' => {
+    'scheme' => 'App Sandbox',
+    'Configuration' => 'App/env/sandbox/EnvBuildSettings.xcconfig'
+  }
+}
+
+platform :ios do
+
+  desc 'Create a xcarchive'
+  lane :archive do |options|
+
+    env = get_environment_config(options)
+
+    build_ios_app(
+      workspace: 'App.xcworkspace',
+      scheme: env['scheme'],
+      silent: true,
+      clean: true,
+      skip_package_ipa: true,
+      skip_codesigning: true,
+      archive_path: "dist/#{env['key']}/#{env['app_name']}-#{env['version_name']}.xcarchive",
+    )
+  end
+
+  lane :export do |options|
+
+    env = get_environment_config(options)
+
+    if options[:export_options].nil? && !options[:export_options].empty?
+      UI.user_error!('Parameter export_options is required for export lane')
+    end
+
+    export_options = File.absolute_path(options[:export_options], File.join(Dir.pwd, '..'))
+
+    unless File.file?(export_options)
+      UI.user_error!("File #{export_options} does not exists")
+    end
+
+    archive_path = File.absolute_path("dist/#{env['key']}/#{env['app_name']}-#{env['version_name']}.xcarchive", File.join(Dir.pwd, '..'))
+    unless File.directory?(archive_path)
+      UI.user_error!("Archive #{archive_path} does not exist. Run lane archive first")
+    end
+
+    export_method = get_info_plist_value(path: export_options, key: "method")
+
+    build_ios_app(
+      workspace: 'App.xcworkspace',
+      scheme: env['scheme'],
+      silent: true,
+      skip_package_ipa: false,
+      skip_build_archive: true,
+      archive_path: archive_path,
+      skip_archive: false,
+      output_directory: "dist/#{env['key']}",
+      output_name: "#{env['app_name']}-#{env['version_name']}-#{export_method}.ipa",
+      export_options: export_options,
+      skip_profile_detection: true
+    )
+  end
+
+  lane :test do |options|
+    env = get_environment_config(options)
+    run_tests(
+      workspace: 'App.xcworkspace',
+      scheme: env['scheme'],
+      device: "iPhone 11",
+    )
+  end
+
+end
+
+def get_environment_config(options)
+  environment_key = options[:env] || 'production'
+  environment = @environments[environment_key]
+
+  if environment.nil?
+    UI.user_error!("Environment '#{environment_key}' not found")
+  end
+
+  app_name = get_xcconfig_value(
+    path: environment['Configuration'],
+    name: 'APP_NAME'
+  )
+
+  version_major = get_xcconfig_value(
+    path: 'App/BuildSettings.xcconfig',
+    name: 'VERSION_MAJOR'
+  ).to_i
+
+  version_minor = get_xcconfig_value(
+    path: 'App/BuildSettings.xcconfig',
+    name: 'VERSION_MINOR'
+  ).to_i
+
+  version_revision = get_xcconfig_value(
+    path: 'App/BuildSettings.xcconfig',
+    name: 'VERSION_REVISION'
+  ).to_i
+
+  version_code = version_major * 10000000 + version_minor * 100000 + version_revision * 1000
+  version_name = "#{version_major}.#{version_minor}.#{version_revision}"
+
+  {
+    'key' => environment_key,
+    'scheme' => environment['scheme'],
+    'app_name' => app_name,
+    'version_code' => version_code,
+    'version_name' => version_name
+  }
+end

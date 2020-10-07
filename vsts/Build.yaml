@@ -1,0 +1,204 @@
+name: $(Date:yyyyMMdd-HHmm)$(Rev:.rr)
+parameters:
+  - name: skipTest
+    displayName: Skip Tests
+    type: boolean
+    default: false
+  - name: buildProduction
+    displayName: Build Production Environment
+    type: boolean
+    default: true
+  - name: buildSandbox
+    displayName: Build Sandbox Environment
+    type: boolean
+    default: true
+  - name: exportIpa
+    displayName: Export Ipa
+    type: boolean
+    default: true
+
+variables:
+
+  # Configure if GoogleService-Info.plist should be configured during build
+  # Use false if GoogleService-Info.plist is checked in in repository
+  # When true pipeline variables 'PROD_GOOGLE_SERVICE_INFO' and 'SANDBOX_GOOGLE_SERVICE_INFO' must
+  # contain the secret file name.
+  configureGoogleServices: true
+
+jobs:
+- job: Build
+  pool:
+    vmImage: 'macos-11'
+  steps:
+
+  ##
+  # Optional configuration of environment
+  ##
+  - ${{ if eq(parameters.buildProduction, 'true')}}:
+    - ${{ if eq(variables.configureGoogleServices, true)}}:
+      - task: DownloadSecureFile@1
+        displayName: Download Prod GoogleService-Info.plist
+        name: ProdGoogleServiceInfo
+        inputs:
+          secureFile: $(PROD_GOOGLE_SERVICE_INFO)
+      - script: |
+          cp $(ProdGoogleServiceInfo.secureFilePath) app/App/env/prod/GoogleService-Info.plist
+        displayName: Copy Prod GoogleService-Info.plist
+
+  - ${{ if eq(parameters.buildSandbox, 'true')}}:
+    - ${{ if eq(variables.configureGoogleServices, true)}}:
+      - task: DownloadSecureFile@1
+        displayName: Download Sandbox GoogleService-Info.plist
+        name: SandboxGoogleServiceInfo
+        inputs:
+          secureFile: $(SANDBOX_GOOGLE_SERVICE_INFO)
+      - script: |
+          cp $(SandboxGoogleServiceInfo.secureFilePath) app/App/env/sandbox/GoogleService-Info.plist
+        displayName: Copy Sandbox GoogleService-Info.plist
+  - task: PowerShell@2
+    displayName: Prepare Environment
+    inputs:
+      targetType: 'inline'
+      script: |
+        function set-configuration($env, $name, $value) {
+            if ($value) {
+              $configFile="app/App/env/$env/AppConfiguration.swift"
+              (Get-Content $configFile) -replace "^(\s*public\s+static\s+let\s+$name`:?\s+[^=]*=\s+`"?)([^`"]*)(`"?)$",  "`${1}$value`${3}" | Set-Content $configFile
+            }
+        }
+        
+        set-configuration "prod" "sentryDSN" `"$Env:PROD_SENTRY_DSN`"
+        set-configuration "prod" "tapkeyOAuthClientId" $Env:PROD_TAPKEY_OAUTH_CLIENT
+        set-configuration "prod" "tapkeyIdentityProviderId" $Env:PROD_TAPKEY_IP_ID
+        set-configuration "prod" "tapkeyDomainId" $Env:PROD_TAPKEY_DOMAIN_ID
+
+        set-configuration "sandbox" "sentryDSN" `"$Env:SANDBOX_SENTRY_DSN`"
+        set-configuration "sandbox" "tapkeyOAuthClientId" $Env:SANDBOX_TAPKEY_OAUTH_CLIENT
+        set-configuration "sandbox" "tapkeyIdentityProviderId" $Env:SANDBOX_TAPKEY_IP_ID
+        set-configuration "sandbox" "tapkeyDomainId" $Env:SANDBOX_TAPKEY_DOMAIN_ID
+  ##
+
+  - task: CmdLine@1
+    displayName: Bundle install
+    inputs:
+      filename: bundle
+      arguments: install
+      workingFolder: 'app'
+  - task: CmdLine@1
+    displayName: Pod install
+    inputs:
+      filename: bundle
+      arguments: exec pod install
+      workingFolder: 'app'
+  - ${{ if eq(parameters.exportIpa, 'true')}}:
+    - task: DownloadSecureFile@1
+      displayName: Download ItunesConnect Api Key
+      name: ApiKey
+      inputs:
+        secureFile: $(ITUNES_CONNECT_API_KEY)
+    - task: DownloadSecureFile@1
+      displayName: Download Keychain
+      name: Keychain
+      inputs:
+        secureFile: $(SIGNING_KEY_KEYCHAIN)
+    - task: CmdLine@1
+      displayName: Download Provisioning Profiles
+      timeoutInMinutes: 2
+      inputs:
+        filename: bundle
+        arguments: 'exec fastlane sigh download_all --api_key_path $(ApiKey.secureFilePath)'
+        workingFolder: 'app'
+    - task: CmdLine@1
+      displayName: Unlock Keychain
+      inputs:
+        filename: bundle
+        arguments: 'exec fastlane run unlock_keychain path:$(Keychain.secureFilePath) password:$(SIGNING_KEY_KEYCHAIN_PW)'
+        workingFolder: 'app'
+  - script: |
+      sudo xcode-select -s /Applications/Xcode_13.2.1.app/Contents/Developer/
+    displayName: Select Xcode 13.2.1
+  - ${{ if eq(parameters.skipTest, 'false')}}:
+    - task: CmdLine@1
+      displayName: Run Tests
+      inputs:
+        filename: bundle
+        arguments: exec fastlane test
+        workingFolder: 'app'
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      condition: not(canceled())
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'app/fastlane/test_output/report.junit'
+  - ${{ if eq(parameters.buildProduction, 'true')}}:
+    - task: CmdLine@1
+      displayName: Archive Production
+      inputs:
+        filename: bundle
+        arguments: exec fastlane archive env:production
+        workingFolder: 'app'
+    - ${{ if eq(parameters.exportIpa, 'true')}}:
+      - task: DownloadSecureFile@1
+        displayName: Download Production AppStore Export Options
+        name: ProdAppStoreExportOptions
+        inputs:
+          secureFile: $(PROD_APPSTORE_EXPORT_OPTION_PLIST)
+      - task: DownloadSecureFile@1
+        displayName: Download Production AdHoc Export Options
+        name: ProdAdhocExportOptions
+        inputs:
+          secureFile: $(PROD_ADHOC_EXPORT_OPTION_PLIST)
+      - task: CmdLine@1
+        displayName: Export Production AppStore IPA
+        inputs:
+          filename: bundle
+          arguments: 'exec fastlane export export_options:$(ProdAppStoreExportOptions.secureFilePath) env:production'
+          workingFolder: 'app'
+      - task: CmdLine@1
+        displayName: Export Production AddHoc IPA
+        inputs:
+          filename: bundle
+          arguments: 'exec fastlane export export_options:$(ProdAdhocExportOptions.secureFilePath) env:production'
+          workingFolder: 'app'
+    - task: PublishBuildArtifacts@1
+      displayName: Store Production Artifacts
+      inputs:
+        PathtoPublish: 'app/dist/production'
+        ArtifactName: 'App Production'
+        publishLocation: Container
+  - ${{ if eq(parameters.buildSandbox, 'true')}}:
+    - task: CmdLine@1
+      displayName: Archive Sandbox
+      inputs:
+        filename: bundle
+        arguments: exec fastlane archive env:sandbox
+        workingFolder: 'app'
+    - ${{ if eq(parameters.exportIpa, 'true')}}:
+      - task: DownloadSecureFile@1
+        displayName: Download Sandbox AppStore Export Options
+        name: SandboxAppStoreExportOptions
+        inputs:
+          secureFile: $(SANDBOX_APPSTORE_EXPORT_OPTION_PLIST)
+      - task: DownloadSecureFile@1
+        displayName: Download Sandbox AdHoc Export Options
+        name: SandboxAdhocExportOptions
+        inputs:
+          secureFile: $(SANDBOX_ADHOC_EXPORT_OPTION_PLIST)
+      - task: CmdLine@1
+        displayName: Export Sandbox AppStore IPA
+        inputs:
+          filename: bundle
+          arguments: 'exec fastlane export export_options:$(SandboxAppStoreExportOptions.secureFilePath) env:sandbox'
+          workingFolder: 'app'
+      - task: CmdLine@1
+        displayName: Export Sandbox AddHoc IPA
+        inputs:
+          filename: bundle
+          arguments: 'exec fastlane export export_options:$(SandboxAdhocExportOptions.secureFilePath) env:sandbox'
+          workingFolder: 'app'
+    - task: PublishBuildArtifacts@1
+      displayName: Store Sandbox Artifacts
+      inputs:
+        PathtoPublish: 'app/dist/sandbox'
+        ArtifactName: 'App Sandbox'
+        publishLocation: Container

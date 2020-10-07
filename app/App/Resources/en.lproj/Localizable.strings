@@ -1,0 +1,87 @@
+/********************
+ *                  *
+ *      English     *
+ *                  *
+ *******************/
+
+/******************
+ Common
+ ******************/
+"ok" = "Ok";
+
+/******************
+ Login
+ ******************/
+"sign_in_using_your_phone_number"    = "Sign in using your phone number:";
+"i_accept_the_terms_and_conditions"  = "I accept the <u>terms and conditions<u>.";
+
+"phone_number_error_missing_code" = "Please include the international calling code, e.g. +49";
+
+"enter_the_code_that_was_sent_to_you" = "Enter the code that was sent to you:";
+"resend_code"      = "Resend code";
+"resend_code_in"   = "Resend code in";
+"continue_sign_in" = "Continue";
+"code_error" = "There was an error, please try again.";
+"wrong_code" = "Wrong code.";
+
+/******************
+ Tab Bar
+ ******************/
+"menu_keys"              = "Keys";
+"settings"               = "Settings";
+
+/******************
+ Keys
+ ******************/
+"nearby"                                              = "Nearby";
+"other"                                               = "Other";
+"restricted"                                          = "Restricted";
+"unrestricted"                                        = "Unrestricted";
+"no_nearby"                                           = "No locks are nearby";
+"open"                                                = "open";
+"ble_needs_to_be_authorized_for_this_app_to_work"     = "BLE needs your permission to be enabled for this app to work.";
+"ble_needs_to_be_enabled_for_this_app_to_work"        = "BLE needs to be enabled for this app to work.";
+"go_to_settings"                                      = "Go to settings ->";
+"updating_keys"                                       = "Updating keys ...";
+
+/******************
+ Key Details
+ ******************/
+"key_details"           = "Key Details";
+"key_always_valid"      = "This key has unrestricted validity.";
+"key_restricted"        = "This key is restricted.";
+"key_offline_access"    = "You can use this key to access %@ offline until %@. It will be renewed on %@.";
+
+/******************
+ Settings
+ ******************/
+"menu_about"              = "About";
+"menu_sign_out"           = "Sign out";
+
+"sign_out_warning_title"    = "Sign out?";
+"sign_out_warning_message"  = "After signing out, you won't be able to access your keys any more.";
+"sign_out_warning_positive" = "Sign out";
+"sign_out_warning_cancel"   = "Cancel";
+
+/******************
+ About
+ ******************/
+"version"              = "Version %@";
+"address"              = "Sample Company";
+"terms_and_conditions" = "Terms and conditions";
+"tos_url"              = "https://tapkey.com/pages/terms-conditions";
+
+/******************
+ Trigger Lock
+ ******************/
+"success" = "Success";
+"wrongLockMode" = "This action cannot be performed right now because the lock is in owner mode.";
+"lockVersionTooOld" = "Please upgrade your lock.";
+"lockVersionTooYoung" = "Please update your app.";
+"lockNotFullyAssembled" = "The lock does not seem to be correctly assembled.";
+"serverCommunicationError" = "Server-Fehler. Bitte prüfe die Internetverbindung.";
+"lockDateTimeInvalid" = "The time of the lock's clock is invalid.";
+"unauthorizedNotYetValid" = "You have a permission to access later.";
+"unauthorized" = "You're not authorized.";
+"lockCommunicationError" = "Connection to the lock was lost. Please try again.";
+"genericError" = "Something went wrong. Please try again.";
