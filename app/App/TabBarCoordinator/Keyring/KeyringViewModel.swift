@@ -78,8 +78,6 @@ class KeyringViewModel: NSObject {
     public weak var navigationDelegate: KeyringViewModelNavigationDelegate?
     public var viewRefreshHandler: (() -> Void)?
 
-    private var queryLocalKeysInProgress: Bool = false
-
     init(tapkeyServiceFactory: TKMServiceFactory) {
 
         self.tapkeyServiceFactory = tapkeyServiceFactory
@@ -117,8 +115,8 @@ class KeyringViewModel: NSObject {
             self.localKeysObserverRegistration = nil
         }
 
-        self.localKeysObserverRegistration = keyManager.keyUpdateObservable.addObserver { [weak self] in
-            self?.queryLocalKeys()
+        self.localKeysObserverRegistration = keyManager.keyUpdateObservable.addObserver { [weak self] _ in
+            self?.refreshModel()
         }
 
         if let ongoingObserverRegistration = self.nearbyBluetoothDevicesObserverRegistration {
@@ -128,7 +126,7 @@ class KeyringViewModel: NSObject {
         }
 
         self.nearbyBluetoothDevicesObserverRegistration = self.bleLockScanner.observable.addObserver { [weak self] _ in
-            self?.loadDataSource()
+            self?.refreshModel()
         }
 
         toggleBluetoothScan()
@@ -185,24 +183,39 @@ class KeyringViewModel: NSObject {
 
     }
 
-    private func loadDataSource() {
+    public func refreshModel() {
+
+        guard !self.userManager.users.isEmpty else {
+            return
+        }
+
+        let userId = self.userManager.users[0]
+
+        self.localKeys = self.keyManager.getLocalKeys(userId: userId)
+
+        if self.shouldScan == true && self.localKeys.isEmpty {
+            self.shouldScan = false
+        }
+
+        if self.shouldScan == false && !self.localKeys.isEmpty {
+            self.shouldScan = true
+        }
 
         let updatedKeyViewModelList = self.localKeys
-            .filter { $0.grant != nil } // grant should not be null anyway, but without grant we can not map it to an physical lock
             .map { key -> KeyViewModel in
 
-                let grant = key.grant! // were already filtered out before
+                let grant = key.grant // were already filtered out before
 
-                let physicalLockId = grant.getBoundLock()?.getPhysicalLockId() ?? ""
+                let physicalLockId = grant.boundLock.physicalLockId
 
-                let isNearby = self.bleLockScanner.isLockNearby(physicalLockId: grant.getBoundLock().getPhysicalLockId())
-                let hasUnlimitedValidity = grant.getValidBefore() == nil && grant.getValidFrom() == nil && grant.getTimeRestrictionIcal() == nil
+                let isNearby = self.bleLockScanner.isLockNearby(physicalLockId: grant.boundLock.physicalLockId)
+                let hasUnlimitedValidity = grant.validBefore == nil && grant.validFrom == nil && grant.timeRestrictionIcal == nil
 
                 if let model = self.keyViewModels[physicalLockId] {
 
                     return model.updateData(
-                        title: grant.getBoundLock()?.getTitle() ?? "",
-                        physicalLockId: grant.getBoundLock()?.getPhysicalLockId() ?? "",
+                        title: grant.boundLock.title,
+                        physicalLockId: grant.boundLock.physicalLockId,
                         isNearby: isNearby,
                         hasUnlimitedValidity: hasUnlimitedValidity,
                         offlineFrom: key.autorenewedBefore,
@@ -212,8 +225,8 @@ class KeyringViewModel: NSObject {
                     // swiftlint:disable:next trailing_closure
                     return KeyViewModel(
                         tapkeyServiceFactory: tapkeyServiceFactory,
-                        title: grant.getBoundLock()?.getTitle() ?? "",
-                        physicalLockId: grant.getBoundLock()?.getPhysicalLockId() ?? "",
+                        title: grant.boundLock.title,
+                        physicalLockId: grant.boundLock.physicalLockId,
                         isNearby: isNearby,
                         hasUnlimitedValidity: hasUnlimitedValidity,
                         offlineFrom: key.autorenewedBefore,
@@ -221,7 +234,7 @@ class KeyringViewModel: NSObject {
                         stateChangedListener: { [weak self] state -> Void in
                             // Refresh view to release pinned items
                             if state == .idle {
-                                self?.loadDataSource()
+                                self?.refreshModel()
                             }
                         })
                 }
@@ -308,50 +321,6 @@ class KeyringViewModel: NSObject {
             return
         }
         navigationDelegate?.keysViewModel(self, presentKeyDetails: keyDetails)
-    }
-
-    public func queryLocalKeys() {
-        if self.queryLocalKeysInProgress {
-            return
-        }
-
-        guard !self.userManager.users.isEmpty else {
-            return
-        }
-
-        let userId = self.userManager.users[0]
-
-        self.queryLocalKeysInProgress = true
-
-        self.keyManager.queryLocalKeysAsync(userId: userId, cancellationToken: TKMCancellationTokens.None)
-            .continueOnUi { [weak self] keyDetails in
-                guard let self = self else {
-                    return
-                }
-                self.localKeys = keyDetails ?? []
-
-                if self.shouldScan == true && self.localKeys.isEmpty {
-                    self.shouldScan = false
-                }
-
-                if self.shouldScan == false && !self.localKeys.isEmpty {
-                    self.shouldScan = true
-                }
-            }
-            .catchOnUi { asyncError in
-                TKMLog.e(KeyringViewModel.TAG, "Failed to query local keys", asyncError.syncSrcError)
-                return nil
-            }
-            .finallyOnUi { [weak self] in
-
-                guard let self = self else {
-                    return
-                }
-
-                self.queryLocalKeysInProgress = false
-                self.loadDataSource()
-            }
-            .conclude()
     }
 
     public func pollForNewKeys() -> TKMPromise<Void> {

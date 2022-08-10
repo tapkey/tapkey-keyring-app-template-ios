@@ -8,8 +8,8 @@ target 'App' do
   use_frameworks!
 
   pod 'SwiftLint'
-  pod 'TapkeyMobileLib', '2.21.2.2'
-  pod 'TapkeyMobileLib/Fcm', '2.21.2.2'
+  pod 'TapkeyMobileLib', '2.28.0.3'
+  pod 'TapkeyMobileLib/Fcm', '2.28.0.3'
   pod 'Firebase/Analytics'
   pod 'Firebase/Auth'
   pod 'Sentry'

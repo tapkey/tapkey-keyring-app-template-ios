@@ -54,12 +54,10 @@ class KeyringViewController: UIViewController, Storyboarded {
         tableView.refreshControl = refreshControl
         setRefreshControlColorScheme()
 
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-
         viewModel.pollForNewKeys()
             .conclude()
 
-        viewModel.queryLocalKeys()
+        viewModel.refreshModel()
     }
 
     override func viewDidDisappear(_ animated: Bool) {

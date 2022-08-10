@@ -90,19 +90,19 @@ PODS:
   - nanopb/decode (1.30906.0)
   - nanopb/encode (1.30906.0)
   - PromisesObjC (1.2.12)
-  - Protobuf (3.19.4)
+  - Protobuf (3.21.4)
   - Sentry (6.2.1):
     - Sentry/Core (= 6.2.1)
   - Sentry/Core (6.2.1)
   - SocketRocket (0.5.1)
   - SwiftLint (0.43.0)
-  - TapkeyMobileLib (2.21.2.2):
-    - TapkeyMobileLib/Core (= 2.21.2.2)
-  - TapkeyMobileLib/Core (2.21.2.2):
+  - TapkeyMobileLib (2.28.0.3):
+    - TapkeyMobileLib/Core (= 2.28.0.3)
+  - TapkeyMobileLib/Core (2.28.0.3):
     - GsonJ2ObjC-Light (= 2.8.6.2)
     - JRE-Slim (= 2.8.1.2-tk)
     - SocketRocket (= 0.5.1)
-  - TapkeyMobileLib/Fcm (2.21.2.2):
+  - TapkeyMobileLib/Fcm (2.28.0.3):
     - Firebase/Messaging (~> 6.34)
     - TapkeyMobileLib/Core
 
@@ -111,11 +111,11 @@ DEPENDENCIES:
   - Firebase/Auth
   - Sentry
   - SwiftLint
-  - TapkeyMobileLib (= 2.21.2.2)
-  - TapkeyMobileLib/Fcm (= 2.21.2.2)
+  - TapkeyMobileLib (= 2.28.0.3)
+  - TapkeyMobileLib/Fcm (= 2.28.0.3)
 
 SPEC REPOS:
-  https://github.com/tapkey/TapkeyCocoaPods:
+  https://tapkey.visualstudio.com/DefaultCollection/Tapkey/_git/TapkeyCocoaPods:
     - GsonJ2ObjC-Light
     - JRE-Slim
     - TapkeyMobileLib
@@ -151,17 +151,17 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: a6a3a066369828db64eda428cb2856dc1cdc7c4e
   GoogleDataTransport: f56af7caa4ed338dc8e138a5d7c5973e66440833
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
-  GsonJ2ObjC-Light: 00ce1a4c53e4f17d1284a1f0c184c6a24c7a76a6
+  GsonJ2ObjC-Light: a553d9a1082cd44eba708b8554ee66340914f914
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
-  JRE-Slim: d65cc65cdf1d46644656bf0889d65d7d8c254c49
+  JRE-Slim: 5f81d3acdbcff60e3eb968f531345d9a58459702
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
-  Protobuf: 235750e4696ff59fb07d949a9dbbc92b3c0700fe
+  Protobuf: 85a48c73d708782e2869564c0438e211aae98e7a
   Sentry: 9b922b396b0e0bca8516a10e36b0ea3ebea5faf7
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   SwiftLint: 0c645fdc6feed3e390c1701ab3cc669f88b42752
-  TapkeyMobileLib: 42db27f41597d5e847845ac1d7c564bdee63fa5a
+  TapkeyMobileLib: f2ffff8ca8a27333eff6302a3d51ef125a72f042
 
-PODFILE CHECKSUM: a5ba10ee8f24f5ccb4f26258941c732035b56a76
+PODFILE CHECKSUM: 1a0b779253863439247e226d4867996cedc41268
 
 COCOAPODS: 1.10.1
