@@ -30,7 +30,7 @@ import Foundation
 
 public class AppConfiguration {
     public static let tapkeyBaseUri = "https://my.sandbox.tapkey.io"
-    public static let tapkeyAuthorizationEndpoint = "https://login.sandbox.ui"
+    public static let tapkeyAuthorizationEndpoint = "https://login.sandbox.tapkey.io"
     public static let tapkeyDomainId: Int32 = 0xFF02
     public static let tapkeyBleServiceUuid: String? = "6e65742e-7470-6b79-2ea0-000006060142"
     public static let tapkeyOAuthClientId = ""
